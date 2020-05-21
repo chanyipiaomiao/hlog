@@ -60,6 +60,7 @@ func main() {
 
 输出结果
 
+json格式
 ```log
 {
   "data": {
@@ -102,7 +103,7 @@ func main() {
   "time": "2020-05-21 17:53:47"
 }
 ```
-
+文本格式
 ```log
 time="2020-05-21 18:23:04" level=debug msg=hello func=github.com/chanyipiaomiao/hlog.Debug file="/Users/wenba/workspace/hlog/hlog.go:284" hello=world
 time="2020-05-21 18:23:04" level=info msg=hello func=github.com/chanyipiaomiao/hlog.Info file="/Users/wenba/workspace/hlog/hlog.go:292" hello=world

@@ -103,6 +103,13 @@ func main() {
 }
 ```
 
+```log
+time="2020-05-21 18:23:04" level=debug msg=hello func=github.com/chanyipiaomiao/hlog.Debug file="/Users/wenba/workspace/hlog/hlog.go:284" hello=world
+time="2020-05-21 18:23:04" level=info msg=hello func=github.com/chanyipiaomiao/hlog.Info file="/Users/wenba/workspace/hlog/hlog.go:292" hello=world
+time="2020-05-21 18:23:04" level=warning msg="呵呵" func=github.com/chanyipiaomiao/hlog.Warn file="/Users/wenba/workspace/hlog/hlog.go:300" username=warn
+time="2020-05-21 18:23:04" level=error msg="呵呵" func=github.com/chanyipiaomiao/hlog.Error file="/Users/wenba/workspace/hlog/hlog.go:308" username=Error
+```
+
 #### 使用全局导入的方式
 
 ```go
@@ -141,6 +148,11 @@ func main() {
 
 }
 
+```
+
+在其他包中导入即可使用
+```go
+import "github.com/chanyipiaomiao/hlog"
 ```
 
 ### 按照级别输出不同的文件

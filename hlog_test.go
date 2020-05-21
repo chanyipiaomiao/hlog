@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func TestNewDefault(t *testing.T) {
-	_, err := New(&Option{
+func TestNew(t *testing.T) {
+	logger, err := New(&Option{
 		LogPath:      "/tmp/logs/hlog.log",
 		LogType:      JSON,
 		LogLevel:     DebugLevel,
@@ -20,17 +20,17 @@ func TestNewDefault(t *testing.T) {
 		return
 	}
 
-	Debug(D{"hello": "world"}, "hello")
-	Info(D{"hello": "world"}, "hello")
-	Warn(D{"username": "warn"}, "呵呵")
-	Error(D{"username": "Error"}, "呵呵")
-	//Panic(D{"username": "Panic"}, "呵呵")
-	//Fatal(D{"username": "Fatal"}, "呵呵")
+	logger.Debug(D{"hello": "world"}, "hello")
+	logger.Info(D{"hello": "world"}, "hello")
+	logger.Warn(D{"username": "warn"}, "呵呵")
+	logger.Error(D{"username": "Error"}, "呵呵")
+	//logger.Panic(D{"username": "Panic"}, "呵呵")
+	//logger.Fatal(D{"username": "Fatal"}, "呵呵")
 
 }
 
 func TestNewSeparate(t *testing.T) {
-	_, err := NewSeparate(&Option{
+	logger, err := NewSeparate(&Option{
 		LogPath:      "/tmp/logs/hlog.log",
 		LogType:      Text,
 		LogLevel:     DebugLevel,
@@ -43,11 +43,11 @@ func TestNewSeparate(t *testing.T) {
 		return
 	}
 
-	Debug(D{"hello": "world"}, "hello")
-	Info(D{"hello": "world"}, "hello")
-	Warn(D{"username": "warn"}, "呵呵")
-	Error(D{"username": "Error"}, "呵呵")
-	//Panic(D{"username": "Panic"}, "呵呵")
-	//Fatal(D{"username": "Fatal"}, "呵呵")
+	logger.Debug(D{"hello": "world"}, "hello")
+	logger.Info(D{"hello": "world"}, "hello")
+	logger.Warn(D{"username": "warn"}, "呵呵")
+	logger.Error(D{"username": "Error"}, "呵呵")
+	//logger.Panic(D{"username": "Panic"}, "呵呵")
+	//logger.Fatal(D{"username": "Fatal"}, "呵呵")
 
 }

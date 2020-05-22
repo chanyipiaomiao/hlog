@@ -10,12 +10,51 @@
 - json日志支持美化输出
 - json日志支持数据key
 - 支持按照时间来轮转日志
-- 支持打印方法名和行数
+- 支持打印文件名和行数
 
 ## 安装
 
 `go get github.com/chanyipiaomiao/hlog`
 
+
+## 配置
+
+```go
+type Option struct {
+	// log 路径
+	LogPath string
+
+	// 日志类型 json|text
+	LogType string
+
+	// 文件名的日期格式
+	FileNameDateFormat string
+
+	// 日志中日期时间格式
+	TimestampFormat string
+
+	// 日志级别
+	LogLevel Level
+
+	// 日志最长保存多久
+	MaxAge time.Duration
+
+	// 日志默认多长时间轮转一次
+	RotationTime time.Duration
+
+	// 是否开启记录文件名和行号
+	IsEnableRecordFileInfo bool
+
+	// 文件名和行号字段名
+	FileInfoField string
+
+	// json日志是否美化输出
+	JSONPrettyPrint bool
+
+	// json日志条目中 数据字段都会作为该字段的嵌入字段
+	JSONDataKey string
+}
+```
 
 ## 例子
 

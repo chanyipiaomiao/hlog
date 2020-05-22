@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"runtime"
 )
 
 // isExist 文件或目录是否存在
@@ -24,4 +25,9 @@ func makeDirAll(logPath string) error {
 	}
 
 	return nil
+}
+
+// 是否是windows系统
+func isWindow() bool {
+	return runtime.GOOS == "windows"
 }

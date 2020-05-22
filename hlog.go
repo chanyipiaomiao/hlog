@@ -6,7 +6,9 @@ import (
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
-	"path"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"time"
 )
 
@@ -16,19 +18,11 @@ const (
 	Text               = "text"                // 普通文本格式日志
 	JSON               = "json"                // json格式日志
 	DataKey            = "data"                // json日志条目中 数据字段都会作为该字段的嵌入字段
-)
-
-var (
-	logger             *Logger
-	fileNameDateFormat string // 日志文件名的日期格式
-	timestampFormat    string // 日志条目中的日期时间格式
+	FileInfoField      = "call"                // 文件名和行号 显示字段
 )
 
 // Level type
 type Level uint32
-
-// 要写入日志的数据字段
-type D map[string]interface{}
 
 const (
 	// 日志级别
@@ -39,6 +33,16 @@ const (
 	InfoLevel
 	DebugLevel
 )
+
+var (
+	logger             *Logger
+	fileNameDateFormat string // 日志文件名的日期格式
+	timestampFormat    string // 日志条目中的日期时间格式
+	fileInfoField      string // 文件名和行号 显示字段
+)
+
+// 要写入日志的数据字段
+type D map[string]interface{}
 
 type Option struct {
 	// log 路径
@@ -62,8 +66,11 @@ type Option struct {
 	// 日志默认多长时间轮转一次
 	RotationTime time.Duration
 
-	// 是否打印方法名和行号
-	ReportCaller bool
+	// 是否开启记录文件名和行号
+	IsEnableRecordFileInfo bool
+
+	// 文件名和行号字段名
+	FileInfoField string
 
 	// json日志是否美化输出
 	JSONPrettyPrint bool
@@ -73,7 +80,8 @@ type Option struct {
 }
 
 type Logger struct {
-	logrus *logrus.Logger
+	logrus               *logrus.Logger
+	enableRecordFileinfo bool
 }
 
 func GetLogger() *Logger {
@@ -90,10 +98,6 @@ func newLogger(option *Option) (*logrus.Logger, error) {
 		return nil, err
 	}
 
-	if !path.IsAbs(option.LogPath) {
-		return nil, fmt.Errorf("LogPath please use absolute path: %s", option.LogPath)
-	}
-
 	if option.FileNameDateFormat == "" {
 		fileNameDateFormat = FileNameDateFormat
 	} else {
@@ -106,9 +110,14 @@ func newLogger(option *Option) (*logrus.Logger, error) {
 		timestampFormat = option.TimestampFormat
 	}
 
+	if option.FileInfoField == "" {
+		fileInfoField = FileInfoField
+	} else {
+		fileInfoField = option.FileInfoField
+	}
+
 	logrusLogger = logrus.New()
 	logrusLogger.SetOutput(ioutil.Discard)
-	logrusLogger.SetReportCaller(option.ReportCaller)
 	logrusLogger.Level = logrus.Level(option.LogLevel)
 
 	switch option.LogType {
@@ -138,18 +147,32 @@ func New(option *Option) (*Logger, error) {
 		logrusLogger *logrus.Logger
 		writer       *rotatelogs.RotateLogs
 		fileHook     *lfshook.LfsHook
+		absPath      string
 	)
 
 	if logrusLogger, err = newLogger(option); err != nil {
 		return nil, err
 	}
 
-	writer, err = rotatelogs.New(
-		fmt.Sprintf("%s-%s", option.LogPath, fileNameDateFormat),
-		rotatelogs.WithMaxAge(option.MaxAge),
-		rotatelogs.WithRotationTime(option.RotationTime),
-		rotatelogs.WithLinkName(option.LogPath),
-	)
+	if isWindow() {
+		writer, err = rotatelogs.New(
+			fmt.Sprintf("%s-%s", option.LogPath, fileNameDateFormat),
+			rotatelogs.WithMaxAge(option.MaxAge),
+			rotatelogs.WithRotationTime(option.RotationTime),
+		)
+	} else {
+		absPath, err = filepath.Abs(option.LogPath)
+		if err != nil {
+			return nil, fmt.Errorf("rotatelogs.New error: %s", err)
+		}
+		writer, err = rotatelogs.New(
+			fmt.Sprintf("%s-%s", absPath, fileNameDateFormat),
+			rotatelogs.WithMaxAge(option.MaxAge),
+			rotatelogs.WithRotationTime(option.RotationTime),
+			rotatelogs.WithLinkName(absPath),
+		)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +189,8 @@ func New(option *Option) (*Logger, error) {
 	logrusLogger.Hooks.Add(fileHook)
 
 	logger = &Logger{
-		logrus: logrusLogger,
+		logrus:               logrusLogger,
+		enableRecordFileinfo: option.IsEnableRecordFileInfo,
 	}
 	return logger, nil
 }
@@ -176,15 +200,30 @@ func newRotatelog(option *Option, levelStr string) (*rotatelogs.RotateLogs, erro
 		err      error
 		filename string
 		writer   *rotatelogs.RotateLogs
+		absPath  string
 	)
 
 	filename = fmt.Sprintf("%s.%s", option.LogPath, levelStr)
-	writer, err = rotatelogs.New(
-		fmt.Sprintf("%s.%s", filename, fileNameDateFormat),
-		rotatelogs.WithLinkName(filename),
-		rotatelogs.WithMaxAge(option.MaxAge),
-		rotatelogs.WithRotationTime(option.RotationTime),
-	)
+	if isWindow() {
+		writer, err = rotatelogs.New(
+			fmt.Sprintf("%s.%s", filename, fileNameDateFormat),
+			rotatelogs.WithMaxAge(option.MaxAge),
+			rotatelogs.WithRotationTime(option.RotationTime),
+		)
+	} else {
+		absPath, err = filepath.Abs(filename)
+		if err != nil {
+			return nil, fmt.Errorf("rotatelogs.New error: %s", err)
+		}
+
+		writer, err = rotatelogs.New(
+			fmt.Sprintf("%s.%s", absPath, fileNameDateFormat),
+			rotatelogs.WithMaxAge(option.MaxAge),
+			rotatelogs.WithRotationTime(option.RotationTime),
+			rotatelogs.WithLinkName(absPath),
+		)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("rotatelogs.New error: %s", err)
 	}
@@ -246,33 +285,52 @@ func NewSeparate(option *Option) (*Logger, error) {
 	logrusLogger.Hooks.Add(fileHook)
 
 	logger = &Logger{
-		logrus: logrusLogger,
+		logrus:               logrusLogger,
+		enableRecordFileinfo: option.IsEnableRecordFileInfo,
 	}
 
 	return logger, nil
 }
 
 func (l *Logger) Debug(dataFields D, message string) {
+	if l.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	l.logrus.WithFields(logrus.Fields(dataFields)).Debug(message)
 }
 
 func (l *Logger) Info(dataFields D, message string) {
+	if l.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	l.logrus.WithFields(logrus.Fields(dataFields)).Info(message)
 }
 
 func (l *Logger) Warn(dataFields D, message string) {
+	if l.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	l.logrus.WithFields(logrus.Fields(dataFields)).Warn(message)
 }
 
 func (l *Logger) Error(dataFields D, message string) {
+	if l.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	l.logrus.WithFields(logrus.Fields(dataFields)).Error(message)
 }
 
 func (l *Logger) Fatal(dataFields D, message string) {
+	if l.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	l.logrus.WithFields(logrus.Fields(dataFields)).Fatal(message)
 }
 
 func (l *Logger) Panic(dataFields D, message string) {
+	if l.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	l.logrus.WithFields(logrus.Fields(dataFields)).Panic(message)
 }
 
@@ -280,6 +338,9 @@ func Debug(dataFields D, message string) {
 	if logger.logrus == nil {
 		logrus.Debug(dataFields, message)
 		return
+	}
+	if logger.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
 	}
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Debug(message)
 }
@@ -289,6 +350,9 @@ func Info(dataFields D, message string) {
 		logrus.Info(dataFields, message)
 		return
 	}
+	if logger.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Info(message)
 }
 
@@ -296,6 +360,9 @@ func Warn(dataFields D, message string) {
 	if logger.logrus == nil {
 		logrus.Warn(dataFields, message)
 		return
+	}
+	if logger.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
 	}
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Warn(message)
 }
@@ -305,6 +372,9 @@ func Error(dataFields D, message string) {
 		logrus.Error(dataFields, message)
 		return
 	}
+	if logger.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Error(message)
 }
 
@@ -312,6 +382,9 @@ func Fatal(dataFields D, message string) {
 	if logger.logrus == nil {
 		logrus.Fatal(dataFields, message)
 		return
+	}
+	if logger.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
 	}
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Fatal(message)
 }
@@ -321,9 +394,26 @@ func Panic(dataFields D, message string) {
 		logrus.Panic(dataFields, message)
 		return
 	}
+	if logger.enableRecordFileinfo {
+		dataFields[fileInfoField] = fileInfo(2)
+	}
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Panic(message)
 }
 
 func StderrFatalf(format string, args ...interface{}) {
 	logrus.Fatalf(format, args...)
+}
+
+func fileInfo(skip int) string {
+	_, file, line, ok := runtime.Caller(skip)
+	if !ok {
+		file = "<???>"
+		line = 1
+	} else {
+		slash := strings.LastIndex(file, "/")
+		if slash >= 0 {
+			file = file[slash+1:]
+		}
+	}
+	return fmt.Sprintf("%s:%d", file, line)
 }

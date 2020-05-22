@@ -7,12 +7,14 @@ import (
 
 func TestNew(t *testing.T) {
 	logger, err := New(&Option{
-		LogPath:      "/tmp/logs/hlog.log",
-		LogType:      JSON,
-		LogLevel:     DebugLevel,
-		MaxAge:       7 * 24 * time.Hour,
-		RotationTime: 24 * time.Hour,
-		ReportCaller: true,
+		LogPath:                "./logs/hlog.log",
+		LogType:                JSON,
+		LogLevel:               DebugLevel,
+		MaxAge:                 7 * 24 * time.Hour,
+		RotationTime:           24 * time.Hour,
+		JSONPrettyPrint:        true,
+		IsEnableRecordFileInfo: true,
+		FileInfoField:          "caller",
 	})
 
 	if err != nil {
@@ -31,11 +33,13 @@ func TestNew(t *testing.T) {
 
 func TestNewSeparate(t *testing.T) {
 	logger, err := NewSeparate(&Option{
-		LogPath:      "/tmp/logs/hlog.log",
-		LogType:      Text,
-		LogLevel:     DebugLevel,
-		MaxAge:       7 * 24 * time.Hour,
-		RotationTime: 24 * time.Hour,
+		LogPath:                "./logs/hlog.log",
+		LogType:                Text,
+		LogLevel:               DebugLevel,
+		MaxAge:                 7 * 24 * time.Hour,
+		RotationTime:           24 * time.Hour,
+		IsEnableRecordFileInfo: true,
+		FileInfoField:          "called",
 	})
 
 	if err != nil {

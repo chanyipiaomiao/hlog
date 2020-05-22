@@ -41,8 +41,9 @@ func main() {
 		MaxAge:             7 * 24 * time.Hour,
 		RotationTime:       24 * time.Hour,
 		JSONPrettyPrint: true,
-		JSONDataKey: "data",
-		ReportCaller: false,
+		JSONDataKey: "",
+		IsEnableRecordFileInfo: true,
+		FileInfoField: "call",
 	})
 
 	if err != nil {
@@ -57,58 +58,69 @@ func main() {
 }
 
 ```
+如果设置了 JSONDataKey: "data", 那么所有的字段都会是data字段的内嵌字段,除了默认的字段msg、time、level 
+这是logrus的默认行为
+
+```log
+{
+  "data": {
+    "call": "main.go:29",
+    "hello": "world"
+  },
+  "level": "debug",
+  "msg": "hello",
+  "time": "2020-05-22 18:16:17"
+}
+```
 
 输出结果
 
 json格式
 ```log
 {
-  "data": {
-    "hello": "world"
-  },
-  "file": "/Users/xxx/workspace/hlog/hlog.go:257",
-  "func": "github.com/chanyipiaomiao/hlog.(*Logger).Debug",
+  "call": "main.go:29",
+  "hello": "world",
   "level": "debug",
   "msg": "hello",
-  "time": "2020-05-21 17:53:47"
+  "time": "2020-05-22 18:11:39"
 }
 {
-  "data": {
-    "hello": "world"
-  },
-  "file": "/Users/xxx/workspace/hlog/hlog.go:261",
-  "func": "github.com/chanyipiaomiao/hlog.(*Logger).Info",
+  "call": "main.go:30",
+  "hello": "world",
   "level": "info",
   "msg": "hello",
-  "time": "2020-05-21 17:53:47"
+  "time": "2020-05-22 18:11:39"
 }
 {
-  "data": {
-    "username": "warn"
-  },
-  "file": "/Users/xxx/workspace/hlog/hlog.go:265",
-  "func": "github.com/chanyipiaomiao/hlog.(*Logger).Warn",
+  "call": "main.go:31",
   "level": "warning",
   "msg": "呵呵",
-  "time": "2020-05-21 17:53:47"
+  "time": "2020-05-22 18:11:39",
+  "username": "warn"
 }
 {
-  "data": {
-    "username": "Error"
-  },
-  "file": "/Users/xxx/workspace/hlog/hlog.go:269",
-  "func": "github.com/chanyipiaomiao/hlog.(*Logger).Error",
+  "call": "main.go:32",
   "level": "error",
   "msg": "呵呵",
-  "time": "2020-05-21 17:53:47"
+  "time": "2020-05-22 18:11:39",
+  "username": "Error"
 }
+{
+  "age": 18,
+  "call": "hello.go:8",
+  "level": "info",
+  "msg": "修改年龄",
+  "time": "2020-05-22 18:11:39"
+}
+
 ```
 文本格式
 ```log
-time="2020-05-21 18:23:04" level=debug msg=hello func=github.com/chanyipiaomiao/hlog.Debug file="/Users/wenba/workspace/hlog/hlog.go:284" hello=world
-time="2020-05-21 18:23:04" level=info msg=hello func=github.com/chanyipiaomiao/hlog.Info file="/Users/wenba/workspace/hlog/hlog.go:292" hello=world
-time="2020-05-21 18:23:04" level=warning msg="呵呵" func=github.com/chanyipiaomiao/hlog.Warn file="/Users/wenba/workspace/hlog/hlog.go:300" username=warn
-time="2020-05-21 18:23:04" level=error msg="呵呵" func=github.com/chanyipiaomiao/hlog.Error file="/Users/wenba/workspace/hlog/hlog.go:308" username=Error
+time="2020-05-22 18:12:14" level=debug msg=hello call="main.go:29" hello=world
+time="2020-05-22 18:12:14" level=info msg=hello call="main.go:30" hello=world
+time="2020-05-22 18:12:14" level=warning msg="呵呵" call="main.go:31" username=warn
+time="2020-05-22 18:12:14" level=error msg="呵呵" call="main.go:32" username=Error
+time="2020-05-22 18:12:14" level=info msg="修改年龄" age=18 call="hello.go:8"
 ```
 
 #### 使用全局导入的方式
@@ -132,8 +144,6 @@ func main() {
 		MaxAge:             7 * 24 * time.Hour,
 		RotationTime:       24 * time.Hour,
 		JSONPrettyPrint: true,
-		JSONDataKey: "data",
-		ReportCaller: true,
 	})
 
 	if err != nil {
@@ -171,6 +181,5 @@ _, err := hlog.NewSeparate(&hlog.Option{
     RotationTime:       24 * time.Hour,
     JSONPrettyPrint: true,
     JSONDataKey: "data",
-    ReportCaller: true,
 })
 ```

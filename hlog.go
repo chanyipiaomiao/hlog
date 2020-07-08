@@ -293,6 +293,9 @@ func NewSeparate(option *Option) (*Logger, error) {
 }
 
 func (l *Logger) Debug(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if l.enableRecordFileinfo {
 		dataFields[fileInfoField] = fileInfo(2)
 	}
@@ -300,6 +303,9 @@ func (l *Logger) Debug(dataFields D, message string) {
 }
 
 func (l *Logger) Info(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if l.enableRecordFileinfo {
 		dataFields[fileInfoField] = fileInfo(2)
 	}
@@ -307,6 +313,9 @@ func (l *Logger) Info(dataFields D, message string) {
 }
 
 func (l *Logger) Warn(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if l.enableRecordFileinfo {
 		dataFields[fileInfoField] = fileInfo(2)
 	}
@@ -314,6 +323,9 @@ func (l *Logger) Warn(dataFields D, message string) {
 }
 
 func (l *Logger) Error(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if l.enableRecordFileinfo {
 		dataFields[fileInfoField] = fileInfo(2)
 	}
@@ -321,6 +333,9 @@ func (l *Logger) Error(dataFields D, message string) {
 }
 
 func (l *Logger) Fatal(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if l.enableRecordFileinfo {
 		dataFields[fileInfoField] = fileInfo(2)
 	}
@@ -328,6 +343,9 @@ func (l *Logger) Fatal(dataFields D, message string) {
 }
 
 func (l *Logger) Panic(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if l.enableRecordFileinfo {
 		dataFields[fileInfoField] = fileInfo(2)
 	}
@@ -335,6 +353,9 @@ func (l *Logger) Panic(dataFields D, message string) {
 }
 
 func Debug(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if logger.logrus == nil {
 		logrus.Debug(dataFields, message)
 		return
@@ -346,6 +367,9 @@ func Debug(dataFields D, message string) {
 }
 
 func Info(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if logger.logrus == nil {
 		logrus.Info(dataFields, message)
 		return
@@ -357,6 +381,9 @@ func Info(dataFields D, message string) {
 }
 
 func Warn(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if logger.logrus == nil {
 		logrus.Warn(dataFields, message)
 		return
@@ -368,6 +395,9 @@ func Warn(dataFields D, message string) {
 }
 
 func Error(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if logger.logrus == nil {
 		logrus.Error(dataFields, message)
 		return
@@ -379,6 +409,9 @@ func Error(dataFields D, message string) {
 }
 
 func Fatal(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if logger.logrus == nil {
 		logrus.Fatal(dataFields, message)
 		return
@@ -390,6 +423,9 @@ func Fatal(dataFields D, message string) {
 }
 
 func Panic(dataFields D, message string) {
+	if dataFields == nil {
+		dataFields = D{}
+	}
 	if logger.logrus == nil {
 		logrus.Panic(dataFields, message)
 		return

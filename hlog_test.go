@@ -22,7 +22,7 @@ func TestNew(t *testing.T) {
 		return
 	}
 
-	logger.Debug(D{"hello": "world"}, "hello")
+	logger.Debug(nil, "hello")
 	logger.Info(D{"hello": "world"}, "hello")
 	logger.Warn(D{"username": "warn"}, "呵呵")
 	logger.Error(D{"username": "Error"}, "呵呵")

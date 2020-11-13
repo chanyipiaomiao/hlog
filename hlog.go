@@ -292,7 +292,8 @@ func NewSeparate(option *Option) (*Logger, error) {
 	return logger, nil
 }
 
-func (l *Logger) Debug(dataFields D, message string) {
+func (l *Logger) Debug(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -302,7 +303,8 @@ func (l *Logger) Debug(dataFields D, message string) {
 	l.logrus.WithFields(logrus.Fields(dataFields)).Debug(message)
 }
 
-func (l *Logger) Info(dataFields D, message string) {
+func (l *Logger) Info(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -312,7 +314,8 @@ func (l *Logger) Info(dataFields D, message string) {
 	l.logrus.WithFields(logrus.Fields(dataFields)).Info(message)
 }
 
-func (l *Logger) Warn(dataFields D, message string) {
+func (l *Logger) Warn(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -322,7 +325,8 @@ func (l *Logger) Warn(dataFields D, message string) {
 	l.logrus.WithFields(logrus.Fields(dataFields)).Warn(message)
 }
 
-func (l *Logger) Error(dataFields D, message string) {
+func (l *Logger) Error(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -332,7 +336,8 @@ func (l *Logger) Error(dataFields D, message string) {
 	l.logrus.WithFields(logrus.Fields(dataFields)).Error(message)
 }
 
-func (l *Logger) Fatal(dataFields D, message string) {
+func (l *Logger) Fatal(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -342,7 +347,8 @@ func (l *Logger) Fatal(dataFields D, message string) {
 	l.logrus.WithFields(logrus.Fields(dataFields)).Fatal(message)
 }
 
-func (l *Logger) Panic(dataFields D, message string) {
+func (l *Logger) Panic(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -352,7 +358,8 @@ func (l *Logger) Panic(dataFields D, message string) {
 	l.logrus.WithFields(logrus.Fields(dataFields)).Panic(message)
 }
 
-func Debug(dataFields D, message string) {
+func Debug(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -366,7 +373,8 @@ func Debug(dataFields D, message string) {
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Debug(message)
 }
 
-func Info(dataFields D, message string) {
+func Info(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -380,7 +388,8 @@ func Info(dataFields D, message string) {
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Info(message)
 }
 
-func Warn(dataFields D, message string) {
+func Warn(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -394,7 +403,8 @@ func Warn(dataFields D, message string) {
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Warn(message)
 }
 
-func Error(dataFields D, message string) {
+func Error(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -408,7 +418,8 @@ func Error(dataFields D, message string) {
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Error(message)
 }
 
-func Fatal(dataFields D, message string) {
+func Fatal(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}
@@ -422,7 +433,8 @@ func Fatal(dataFields D, message string) {
 	logger.logrus.WithFields(logrus.Fields(dataFields)).Fatal(message)
 }
 
-func Panic(dataFields D, message string) {
+func Panic(dataFields D, format string, v ...interface{}) {
+	message := fmt.Sprintf(format, v...)
 	if dataFields == nil {
 		dataFields = D{}
 	}

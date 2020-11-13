@@ -22,10 +22,10 @@ func TestNew(t *testing.T) {
 		return
 	}
 
-	logger.Debug(nil, "hello")
-	logger.Info(D{"hello": "world"}, "hello")
-	logger.Warn(D{"username": "warn"}, "呵呵")
-	logger.Error(D{"username": "Error"}, "呵呵")
+	logger.Debug(nil, "hello: %s", "world")
+	logger.Info(D{"hello": "world"}, "hello: %s", "world")
+	logger.Warn(D{"username": "warn"}, "hello: %s", "world")
+	logger.Error(D{"username": "Error"}, "hello: %s", "world")
 	//logger.Panic(D{"username": "Panic"}, "呵呵")
 	//logger.Fatal(D{"username": "Fatal"}, "呵呵")
 

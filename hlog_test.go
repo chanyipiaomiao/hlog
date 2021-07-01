@@ -55,3 +55,11 @@ func TestNewSeparate(t *testing.T) {
 	//logger.Fatal(D{"username": "Fatal"}, "呵呵")
 
 }
+
+func TestPrintln(t *testing.T) {
+	Println("测试")
+}
+
+func TestPrintf(t *testing.T) {
+	Printf("hello: %s", "world")
+}

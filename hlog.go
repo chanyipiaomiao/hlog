@@ -452,6 +452,20 @@ func StderrFatalf(format string, args ...interface{}) {
 	logrus.Fatalf(format, args...)
 }
 
+func Printf(format string, args ...interface{}) {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: TimestampFormat,
+	})
+	logrus.Printf(format, args...)
+}
+
+func Println(args ...interface{}) {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: TimestampFormat,
+	})
+	logrus.Println(args...)
+}
+
 func fileInfo(skip int) string {
 	_, file, line, ok := runtime.Caller(skip)
 	if !ok {

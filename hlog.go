@@ -452,18 +452,8 @@ func StderrFatalf(format string, args ...interface{}) {
 	logrus.Fatalf(format, args...)
 }
 
-func Printf(format string, args ...interface{}) {
-	logrus.SetFormatter(&logrus.TextFormatter{
-		TimestampFormat: TimestampFormat,
-	})
-	logrus.Printf(format, args...)
-}
-
-func Println(args ...interface{}) {
-	logrus.SetFormatter(&logrus.TextFormatter{
-		TimestampFormat: TimestampFormat,
-	})
-	logrus.Println(args...)
+func Print(format string, args ...interface{}) {
+	fmt.Printf(fmt.Sprintf("%s => %s\n", getNowDateTime(), format), args...)
 }
 
 func fileInfo(skip int) string {
